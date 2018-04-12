@@ -1,16 +1,14 @@
-var admin = require('firebase-admin');
+// requires go here
+const admin = require("firebase-admin");
 
-var admin = require("firebase-admin");
+const express = require('express');
 
-var express = require('express');
+const bodyParser = require('body-parser');
 
-var bodyParser = require('body-parser')
+const fetch = require('node-fetch');
 
-var app = express();
+const app = express();
 
-var test = require('./test.js');
-
-console.log(test.lorem());
 
 // Database init
 var serviceAccount = {
@@ -29,22 +27,63 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://letsdolunch-4aacb.firebaseio.com"
 });
-
 var db = admin.database();
 
-db.ref('test').set('test');
+const googleKey = 'AIzaSyBIrnN4jyD-yi9j51E_4xxmpaRVEg2Anvs';
+// middleware goes here
+app.use(bodyParser.json())
 
 
+app.post('/', (req, res) => {
+  let reqData = req.body.zipcode;
 
-app.get('/', function(req, res) {
-  res.send("Please use the endpoint.");
+  db.ref("sessions/").push({
+    zipcode: reqData,
+    long: "long",
+    lat: "lat"
+  })
+    .then(snap => {
+
+
+      res.json({
+        trackingCode: snap.key
+      })
+    });
+
 });
 
-app.get('/test', function(req, res) {
-  let data = test.lorem();
-  res.send(data);
+app.get('/:trackingCode', (req, res) => {
+  let id = req.params.trackingCode;
+
+    db.ref("sessions/" + id).once('value', snap => {
+      fetch('https://maps.googleapis.com/maps/api/place/textsearch/json?query=restaurants+in+Sydney&key='+googleKey)
+      .then(res => res.json())
+      .then(data => {
+        db.ref("sessions/"+id+'/locations').set(data);
+      let key = snap.key;
+
+      res.json({
+          key: {
+            locations: data
+          }
+        });
+      });
+
+  });
+
+
 
 });
+
+app.post('/:trackingCode/:placeId', (req, res) => {
+  let id = req.params.trackingCode;
+  let place = req.params.placeId;
+  db.ref("sessions/" + id +'/votes').set(place);
+  res.json('response: vote was counted')
+
+});
+
+
 
 var port = process.env.PORT || 3000;
 app.listen(port);
