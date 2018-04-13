@@ -4,7 +4,7 @@ const db = require('../database/database.js').db;
 
 const startsession = (req, res, next) => {
   console.log('I am triggered')
-  let reqData = req.body.users;
+
   let locationCoords = req.body.location;
   let email = req.body.email;
   let guests = req.body.guests;
