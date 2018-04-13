@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "Back End for lets have lunch",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {},
   "author": "German Gambo",
   "license": "MIT",

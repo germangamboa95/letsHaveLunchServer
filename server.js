@@ -9,6 +9,38 @@ const fetch = require('node-fetch');
 
 const app = express();
 
+const nodemailer = require('nodemailer');
+
+
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'germangamboa95@gmail.com',
+    pass: '0599486Ger'
+  }
+});
+
+var mailOptions = {
+  from: 'germangamboa95@gmail.com',
+  to: 'ggg.41695@gmail.com',
+  subject: 'Sending Email using Node.js',
+  text: 'That was easy!'
+};
+
+
+function foobar () {
+  transporter.sendMail(mailOptions, function(error, info){
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
+});
+}
+
+
+
 
 // Database init
 var serviceAccount = {
@@ -22,69 +54,154 @@ var serviceAccount = {
   "token_uri": "https://accounts.google.com/o/oauth2/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-e1h6g%40letsdolunch-4aacb.iam.gserviceaccount.com"
-}
+};
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://letsdolunch-4aacb.firebaseio.com"
 });
 var db = admin.database();
 
-const googleKey = 'AIzaSyBIrnN4jyD-yi9j51E_4xxmpaRVEg2Anvs';
+const googleKey = "AIzaSyBIrnN4jyD-yi9j51E_4xxmpaRVEg2Anvs";
+
+
+
 // middleware goes here
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 
-app.post('/', (req, res) => {
-  let reqData = req.body.zipcode;
 
+//  End voting tracker
+app.use('/api/:trackingCode/', (req, res, next) => {
+  sessionId = req.params.trackingCode;
+  console.log(sessionId);
+  db.ref('sessions/' + sessionId + '/emails').once('value', (snap) => {
+    let emailsAmt = snap.val();
+    emailsAmt = emailsAmt.length;
+    db.ref('sessions/' + sessionId + '/guest_qty').once('value', snap => {
+      let limit = snap.val();
+      limit = parseInt(limit);
+      if (emailsAmt >= limit) {
+        db.ref('sessions/' + sessionId + "/voting_done").once('value', snap => {
+          db.ref('sessions/' + sessionId + "/voting_done").set(true);
+          console.log('voting done');
+          foobar();
+        });
+
+      }
+
+    });
+    next();
+  });
+
+});
+
+
+app.post('/api/session_start', (req, res) => {
+  let reqData = req.body.users;
+  let locationCoords = req.body.location;
+  let email = req.body.email;
+  let guests = req.body.guests;
   db.ref("sessions/").push({
-    zipcode: reqData,
-    long: "long",
-    lat: "lat"
-  })
+      locationCoords: locationCoords,
+      emails: [email],
+      guest_qty: guests,
+      voting_done: false
+    })
     .then(snap => {
-
-
       res.json({
         trackingCode: snap.key
-      })
+      });
     });
 
 });
 
-app.get('/:trackingCode', (req, res) => {
+//Location data point
+app.get('/api/:trackingCode/load_location_data', (req, res) => {
   let id = req.params.trackingCode;
-
-    db.ref("sessions/" + id).once('value', snap => {
-      fetch('https://maps.googleapis.com/maps/api/place/textsearch/json?query=restaurants+in+Sydney&key='+googleKey)
+  db.ref("sessions/" + id).once('value', snap => {
+    fetch('https://maps.googleapis.com/maps/api/place/textsearch/json?query=restaurants+in+Sydney&key=' + googleKey)
       .then(res => res.json())
       .then(data => {
-        db.ref("sessions/"+id+'/locations').set(data);
-      let key = snap.key;
+        db.ref("sessions/" + id + '/locations').set(data);
+        let key = snap.key;
 
-      res.json({
+        res.json({
           key: {
             locations: data
           }
         });
       });
+  });
+});
 
+//  Add email
+app.post('/api/:trackingCode/email_add', (req, res) => {
+  const email = req.body.email;
+  const trackingCode = req.params.trackingCode;
+  db.ref('sessions/' + trackingCode + "/emails").once('value', snap => {
+    const emailArr = snap.val();
+    emailArr.push(email);
+    db.ref('sessions/' + trackingCode + "/emails").set(emailArr);
+
+    res.json('email added succesfully');
+  });
+
+});
+
+
+
+
+//voting middleware
+app.use('/api/:trackingCode/vote/:placeId', (req, res, next) => {
+
+  let placeId = req.params.placeId;
+  let trackingCode = req.params.trackingCode;
+  db.ref('sessions/' + sessionId + "/voting_done").once('value', snap => {
+    if (!snap.val()) {
+      db.ref('sessions/' + trackingCode + '/votes/' + placeId).once('value', (snap) => {
+
+        if (snap.val()) {
+
+          db.ref("sessions/" + trackingCode + '/votes/' + placeId).once('value', snap => {
+            console.log(typeof snap.val());
+            let count = snap.val();
+            count++;
+            db.ref("sessions/" + trackingCode + '/votes/' + placeId).set(count);
+
+          });
+          next();
+        } else {
+          console.log('I do not exist');
+          let num = 1;
+          db.ref("sessions/" + trackingCode + '/votes/' + placeId).set(num);
+          next();
+        }
+
+      });
+
+    } else {
+      next();
+    }
+  });
+
+
+});
+
+//Voting endpoint
+app.post('/api/:trackingCode/vote/:placeId', (req, res) => {
+  let trackingCode = req.params.trackingCode;
+  db.ref("sessions/" + trackingCode + '/votes').once('value', snap => {
+    res.json(snap.val());
   });
 
 
 
 });
 
-app.post('/:trackingCode/:placeId', (req, res) => {
-  let id = req.params.trackingCode;
-  let place = req.params.placeId;
-  db.ref("sessions/" + id +'/votes').set(place);
-  res.json('response: vote was counted')
-
-});
 
 
 
-var port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
+
 app.listen(port);
 console.log('Server is starting...');
