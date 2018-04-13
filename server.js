@@ -35,7 +35,7 @@ app.get('/', function(req, res,){
 app.use('/api/session_start', sessions.startsession)
 app.post('/api/session_start', (req, res) => {
   let data = res.locals.trackingCode;
-  res.json(data); 
+  res.json(data);
 
 });
 
@@ -73,6 +73,15 @@ app.post('/api/:trackingCode/vote/:placeId', (req, res) => {
     res.json(snap.val());
   });
 
+
+
+});
+
+app.get('/api/:trackingCode/get_res', (req, res) =>{
+  let trackingCode = req.params.trackingCode;
+  db.ref('sessions/'+trackingCode).once('value', snap => {
+    res.json(snap.val());
+  });
 
 
 });
