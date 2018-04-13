@@ -28,7 +28,8 @@ You will receive a JSON response with the current images for the session.
 The key for each image is the place_id for each location.
 
 ex:
-''
+
+``
       {
         "ChIJW1T-ZUqH3YgRL55uMbBRnW8": "https://lh3.googleusercontent.com/p/AF1QipPHC69ORGH1WMGQ1oOvJ8LYr602uXKNeMGWIktL=s1600-w400",
         "ChIJa7iM4DKH3YgRKLjmXG0JrjI": "https://lh3.googleusercontent.com/p/AF1QipPi1YEyNDpyrYgf62iGxMdoaZPjRASIotNcgkic=s1600-w400",
