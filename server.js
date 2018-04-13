@@ -24,11 +24,6 @@ const images = require('./middleware/images.js');
 
 // middleware goes here
 app.use(bodyParser.json());
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
 
 app.get('/', function(req, res,){
   res.send('Use the api endpoints!')
@@ -56,7 +51,19 @@ app.get('/api/:trackingCode/load_location_data', (req, res) => {
 
 app.get('/api/:trackingCode/load_images', (req, res) => {
   let trackingCode = req.params.trackingCode;
-  db.ref('sessions/'+trackingCode+'/locations/images').once('value', snap => res.json(snap.val()))
+  db.ref('sessions/'+trackingCode+'/locations/images').once('value', snap => {
+    let foo = snap.val();
+    let arr = [];
+    for(let i in foo) {
+      console.log(i);
+      let obj = { [i] : foo[i]};
+      arr.push(obj);
+
+    }
+
+    console.log(arr);
+    res.json(arr);
+  });
 });
 
 //  End voting tracker this has to be here for some reason...
@@ -85,7 +92,7 @@ app.post('/api/:trackingCode/vote/:placeId', (req, res) => {
 app.get('/api/:trackingCode/get_res', (req, res) =>{
   let trackingCode = req.params.trackingCode;
   db.ref('sessions/'+trackingCode).once('value', snap => {
-    res.json([snap.val()]);
+    res.json(snap.val());
   });
 
 
