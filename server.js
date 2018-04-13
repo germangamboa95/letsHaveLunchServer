@@ -1,5 +1,4 @@
 // requires go here
-const admin = require("firebase-admin");
 
 const express = require('express');
 
@@ -11,181 +10,61 @@ const app = express();
 
 const nodemailer = require('nodemailer');
 
+const voting = require('./middleware/voting.js');
 
+const db = require('./database/database.js').db;
 
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'germangamboa95@gmail.com',
-    pass: '0599486Ger'
-  }
-});
+const emails = require("./middleware/emails.js");
 
-var mailOptions = {
-  from: 'germangamboa95@gmail.com',
-  to: 'ggg.41695@gmail.com',
-  subject: 'Sending Email using Node.js',
-  text: 'That was easy!'
-};
+const sessions = require("./middleware/sessions.js");
 
+const locations = require('./middleware/locations.js');
 
-function foobar () {
-  transporter.sendMail(mailOptions, function(error, info){
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Email sent: ' + info.response);
-  }
-});
-}
-
-
-
-
-// Database init
-var serviceAccount = {
-  "type": "service_account",
-  "project_id": "letsdolunch-4aacb",
-  "private_key_id": "8ae3f105e8c71ff0834dfd7e063094067a7e035c",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC1RypygoR+R1DK\nZfZzKnz7zKRMQRG5uKMysHOm5wG3elw2w/ucApd2yUS7c3PwoDI8AQdfjL9HM56A\nnmNVsCfzFx339wCAzsbHHCIQrFrxGmhV4M8JXncyTD2jSF2UQIVF6W09+aIAVZXW\nQermK4hW+0Z9rRD8acSWkqqBiIZD5cGNBbHKteo7cACFYu0yjsnGXsbwIW0h8tTX\n4hI+L2W2lQvzFX0S/eDMuf5gQNBc5d+JBmLjSAPqFDBe2y0DeTm7xVMBIVxwgIO7\nAo7FHHqXKeSsn0oz07sBUy4s6aARUl522L+LxGaJaB3hU/Zly5G7nbneYBZh5E+U\nAtUuMFEfAgMBAAECggEAKLs4VOlxpsQUaZ3WbdMWqSc2pXGbb30Gol2WZuKR9q12\nKdIIZ2oHqWeY23uaCe+cyfG7O+NumSuGikTMchT2LP89OxmTUd3kORnfp5pqhrEV\nz3IHYwYIR1NtKBKbADQtHePQqXO9TFDurWk7RAN1C4JDOPrZjbWgN+r1h8xqyrdk\n4NhS9yDtZyEUXkelytQXeOVk1CwhbVTr+OjbJoxl6ou1+DfivTSk68FtgrzOOtjF\nJehU+tgSgF1hoLnMXAiU/KRPvba/071Z3zdKj3y22zpIA5pXXjx7COL73HBZBHre\ne3Q9HVbeevCafbdt1gSSgu9HzpANZ2EsaNfw6ZeujQKBgQDZ764CNAI/FinWvRcI\nHhakEoM50Cjo14lHOn8600I3feJ22YD4+1+4n8PHghIeq4ZV3F6B0kL3gVsCYRfE\np0CcUWWrgHeH0D8BwvmqyETOmJTd5haO74t1ShcnTGTyRM39uL5EAYMvIC8UwGfX\nbhu57MV2d5Pw5SqNN7PK8Z6UUwKBgQDU8G4Aqd7Vn9iRxadYrAX+Tw3b5yqnHy3O\nFKGpEkoIjupTmF68oEXrCy+Ld9vNzSvnrgDh9XAUqv8MoMGAplVnXvbKio42zpDg\nR8I1NGQOkTzsvC8Yj5rI3EFOutMKq+nzBX2Fy7V2jlRHYwDeayz+6ANNyqz1a12U\nduJPmfV2hQKBgHzU+AQVDFBcfpyc9OtWaLuUSww7eqNciip9jFECn0Qv3B8dmO2E\n9yBGixrlG0HsF+docc3ExU0GED49pSKkdrLTQPxKeq0VkHGO3/l9+0OnTGYKHFPF\nTEljpf2BmbTXynIRdxJ3F1BQDAfD6fcQ/9qwj6668cejTItVI6wUWDQ3AoGBAIEZ\n/DeexiGStkU7JsjWExQqbeajcvK8LpNBYvoUwpoJu/xO5zFJotpsf7j5RGS0PihL\nEPHuUrPVMKlBVdBgCGuR4eLOuoZ0GtY/63lCeF90oxGMzqj/eALLtzS6hHV14XOc\nIoxaA30LsgFN/xras/8gP9CMTuzE2YnHwlIsr+vZAoGBAIh+KlDeCaWkrdvrEdsb\nqzJFWrrHU9dPdjw48zQvxOryfZ8E2oGNQrupMjT21e0qaOfALQWCIuXJsf/2yyMA\n4+bnJn3S1loaQiWKao13WJkT7nRV6g6NB4zh7rmy1DsF/AmWcv9qoOitWIgRtX43\nYZr6Qp6kG1O1nyi1dPGsQX+R\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-e1h6g@letsdolunch-4aacb.iam.gserviceaccount.com",
-  "client_id": "113450448285659546689",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://accounts.google.com/o/oauth2/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-e1h6g%40letsdolunch-4aacb.iam.gserviceaccount.com"
-};
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://letsdolunch-4aacb.firebaseio.com"
-});
-var db = admin.database();
-
-const googleKey = "AIzaSyBIrnN4jyD-yi9j51E_4xxmpaRVEg2Anvs";
-
-
+const images = require('./middleware/images.js');
 
 // middleware goes here
 app.use(bodyParser.json());
 
-
-
-//  End voting tracker
-app.use('/api/:trackingCode/', (req, res, next) => {
-  sessionId = req.params.trackingCode;
-  console.log(sessionId);
-  db.ref('sessions/' + sessionId + '/emails').once('value', (snap) => {
-    let emailsAmt = snap.val();
-    emailsAmt = emailsAmt.length;
-    db.ref('sessions/' + sessionId + '/guest_qty').once('value', snap => {
-      let limit = snap.val();
-      limit = parseInt(limit);
-      if (emailsAmt >= limit) {
-        db.ref('sessions/' + sessionId + "/voting_done").once('value', snap => {
-          db.ref('sessions/' + sessionId + "/voting_done").set(true);
-          console.log('voting done');
-          foobar();
-        });
-
-      }
-
-    });
-    next();
-  });
-
+app.get('/', function(req, res,){
+  res.send('Use the api endpoints!')
 });
 
 
+
+// init session
+app.use('/api/session_start', sessions.startsession)
 app.post('/api/session_start', (req, res) => {
-  let reqData = req.body.users;
-  let locationCoords = req.body.location;
-  let email = req.body.email;
-  let guests = req.body.guests;
-  db.ref("sessions/").push({
-      locationCoords: locationCoords,
-      emails: [email],
-      guest_qty: guests,
-      voting_done: false
-    })
-    .then(snap => {
-      res.json({
-        trackingCode: snap.key
-      });
-    });
+  let data = res.locals.trackingCode;
+  res.json(data); 
 
 });
 
 //Location data point
+app.use('/api/:trackingCode/load_location_data', locations.loadLocations);
+app.use('/api/:trackingCode/load_location_data', images.loadImages);
 app.get('/api/:trackingCode/load_location_data', (req, res) => {
-  let id = req.params.trackingCode;
-  db.ref("sessions/" + id).once('value', snap => {
-    fetch('https://maps.googleapis.com/maps/api/place/textsearch/json?query=restaurants+in+Sydney&key=' + googleKey)
-      .then(res => res.json())
-      .then(data => {
-        db.ref("sessions/" + id + '/locations').set(data);
-        let key = snap.key;
+  let trackingCode = req.params.trackingCode;
 
-        res.json({
-          key: {
-            locations: data
-          }
-        });
-      });
-  });
+    db.ref('sessions/'+trackingCode+'/locations').once('value', snap => res.json(snap.val()))
+
 });
+
+app.get('/api/:trackingCode/load_images', (req, res) => {
+  let trackingCode = req.params.trackingCode;
+  db.ref('sessions/'+trackingCode+'/locations/images').once('value', snap => res.json(snap.val()))
+});
+
+//  End voting tracker this has to be here for some reason...
+app.use('/api/:trackingCode/', voting.votingDone);
 
 //  Add email
 app.post('/api/:trackingCode/email_add', (req, res) => {
-  const email = req.body.email;
-  const trackingCode = req.params.trackingCode;
-  db.ref('sessions/' + trackingCode + "/emails").once('value', snap => {
-    const emailArr = snap.val();
-    emailArr.push(email);
-    db.ref('sessions/' + trackingCode + "/emails").set(emailArr);
-
-    res.json('email added succesfully');
-  });
-
+      emails.addEmail(req, res);
+      res.json('email added succesfully');
 });
 
-
-
-
-//voting middleware
-app.use('/api/:trackingCode/vote/:placeId', (req, res, next) => {
-
-  let placeId = req.params.placeId;
-  let trackingCode = req.params.trackingCode;
-  db.ref('sessions/' + sessionId + "/voting_done").once('value', snap => {
-    if (!snap.val()) {
-      db.ref('sessions/' + trackingCode + '/votes/' + placeId).once('value', (snap) => {
-
-        if (snap.val()) {
-
-          db.ref("sessions/" + trackingCode + '/votes/' + placeId).once('value', snap => {
-            console.log(typeof snap.val());
-            let count = snap.val();
-            count++;
-            db.ref("sessions/" + trackingCode + '/votes/' + placeId).set(count);
-
-          });
-          next();
-        } else {
-          console.log('I do not exist');
-          let num = 1;
-          db.ref("sessions/" + trackingCode + '/votes/' + placeId).set(num);
-          next();
-        }
-
-      });
-
-    } else {
-      next();
-    }
-  });
-
-
-});
+// Tally votes middleware
+app.use('/api/:trackingCode/vote/:placeId', voting.tallyVotes);
 
 //Voting endpoint
 app.post('/api/:trackingCode/vote/:placeId', (req, res) => {
@@ -199,9 +78,7 @@ app.post('/api/:trackingCode/vote/:placeId', (req, res) => {
 });
 
 
-
-
 const port = process.env.PORT || 3000;
 
 app.listen(port);
-console.log('Server is starting...');
+console.log('Server is starting...', port);
