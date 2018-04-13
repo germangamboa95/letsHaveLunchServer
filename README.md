@@ -1,6 +1,8 @@
 ## Starting a session
 
 POST  https://letshavelunchserver.herokuapp.com/api/session_start
+
+```
 	body:{
     emails: 'example@mail.com',
     location: {
@@ -9,6 +11,7 @@ POST  https://letshavelunchserver.herokuapp.com/api/session_start
     },
     guests: 5
   }
+```
 
 You will receive a response with the session key:
 
