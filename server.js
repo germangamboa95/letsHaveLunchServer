@@ -85,7 +85,7 @@ app.post('/api/:trackingCode/vote/:placeId', (req, res) => {
 app.get('/api/:trackingCode/get_res', (req, res) =>{
   let trackingCode = req.params.trackingCode;
   db.ref('sessions/'+trackingCode).once('value', snap => {
-    res.json(snap.val());
+    res.json([snap.val()]);
   });
 
 
