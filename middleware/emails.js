@@ -38,7 +38,7 @@ const emailBlast = (trackingCode) => {
 
 const addEmail = (req, res, next) => {
   const email = req.body.email;
-  console.log(email, "CHECK ME HERE")
+  console.log(req.body , "CHECK ME HERE")
   const trackingCode = req.params.trackingCode;
   db.ref('sessions/' + trackingCode + "/emails").once('value', snap => {
     const emailArr = snap.val();
