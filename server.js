@@ -8,8 +8,6 @@ const fetch = require('node-fetch');
 
 const app = express();
 
-const nodemailer = require('nodemailer');
-
 const voting = require('./middleware/voting.js');
 
 const db = require('./database/database.js').db;
@@ -57,17 +55,15 @@ app.get('/api/:trackingCode/load_location_data', (req, res) => {
 
 app.get('/api/:trackingCode/load_images', (req, res) => {
   let trackingCode = req.params.trackingCode;
-  db.ref('sessions/'+trackingCode+'/locations/images').once('value', snap => {
-    let foo = snap.val();
+  db.ref('sessions/'+trackingCode+'/images').once('value', snap => {
+    let images = snap.val();
     let arr = [];
-    for(let i in foo) {
-      console.log(i);
-      let obj = { [i] : foo[i]};
+    for(let i in images) {
+      let obj = { [i] : images[i]};
       arr.push(obj);
 
     }
 
-    console.log(arr);
     res.json(arr);
   });
 });

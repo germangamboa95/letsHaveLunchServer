@@ -47,23 +47,28 @@ const loadLocations = (req, res, next) => {
   const lon = -81.427695;
   const radius = 1000;
 
-  db.ref('sessions/' + trackingCode + '/votes/' + placeId).once('value', (snap) => {
+  db.ref('sessions/' + trackingCode + '/locations').once('value', (snap) => {
 
      if (snap.val()) {
+       let arr = [];
+       let data = Array.from(snap.val());
+       data = data.filter((item) => item != 'images');
+       res.locals.locationData = data;
+       next();
 
-      db.ref("sessions/" + trackingCode + '/votes/' + placeId).once('value', snap => {
-        console.log(typeof snap.val());
-        let count = snap.val();
-        count++;
-        db.ref("sessions/" + trackingCode + '/votes/' + placeId).set(count);
-
-      });
-      next();
     } else {
       console.log('I do not exist');
-      let num = 1;
-      db.ref("sessions/" + trackingCode + '/votes/' + placeId).set(num);
-      next();
+      fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&opennow&type=restaurant&keyword=restaurant&key=${googleKey}`)
+        .then(res => res.json())
+        .then(data => {
+          console.log(data);
+
+          data = captureLocations(data);
+          data = filterOutGeometry(data);
+          db.ref("sessions/" + trackingCode+"/locations/").set(data);
+          res.locals.locationData = data;
+          next();
+        });
     }
 
   });
@@ -82,23 +87,20 @@ const loadLocations = (req, res, next) => {
 
 
 
-
-  db.ref("sessions/" + trackingCode).once('value', snap => {
-    fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&opennow&type=restaurant&keyword=restaurant&key=${googleKey}`)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-
-
-        data = captureLocations(data);
-
-
-        data = filterOutGeometry(data);
-        db.ref("sessions/" + trackingCode+"/locations/").set(data);
-        res.locals.locationData = data;
-        next();
-      });
-  });
+  //
+  // db.ref("sessions/" + trackingCode).once('value', snap => {
+  //   fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&opennow&type=restaurant&keyword=restaurant&key=${googleKey}`)
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       console.log(data);
+  //
+  //       data = captureLocations(data);
+  //       data = filterOutGeometry(data);
+  //       db.ref("sessions/" + trackingCode+"/locations/").set(data);
+  //       res.locals.locationData = data;
+  //       next();
+  //     });
+  // });
 };
 
 module.exports = {

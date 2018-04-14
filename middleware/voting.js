@@ -21,7 +21,6 @@ const tallyVotes = (req, res, next) => {
             });
             next();
           } else {
-            console.log('I do not exist');
             let num = 1;
             db.ref("sessions/" + trackingCode + '/votes/' + placeId).set(num);
             next();
