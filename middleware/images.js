@@ -9,10 +9,10 @@ const getPhotos = (id, ref, trackingCode) => {
       url = res.url;
       db.ref("sessions/" + trackingCode + '/images/' + ref).set(url);
     });
-
 };
 
 const loadImages = (req, res, next) => {
+
   let trackingCode = req.params.trackingCode;
   let data = res.locals.locationData;
 
@@ -23,7 +23,6 @@ const loadImages = (req, res, next) => {
       next();
 
     } else {
-      console.log('I do not exist');
 
       data.forEach(item => {
         let id = item["photos"];
@@ -33,12 +32,7 @@ const loadImages = (req, res, next) => {
 
       next();
     }
-
-
-
   });
-
-
 };
 
 
