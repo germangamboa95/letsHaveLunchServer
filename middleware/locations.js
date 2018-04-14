@@ -47,10 +47,47 @@ const loadLocations = (req, res, next) => {
   const lon = -81.427695;
   const radius = 1000;
 
+  db.ref('sessions/' + trackingCode + '/votes/' + placeId).once('value', (snap) => {
+
+     if (snap.val()) {
+
+      db.ref("sessions/" + trackingCode + '/votes/' + placeId).once('value', snap => {
+        console.log(typeof snap.val());
+        let count = snap.val();
+        count++;
+        db.ref("sessions/" + trackingCode + '/votes/' + placeId).set(count);
+
+      });
+      next();
+    } else {
+      console.log('I do not exist');
+      let num = 1;
+      db.ref("sessions/" + trackingCode + '/votes/' + placeId).set(num);
+      next();
+    }
+
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   db.ref("sessions/" + trackingCode).once('value', snap => {
     fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&opennow&type=restaurant&keyword=restaurant&key=${googleKey}`)
       .then(res => res.json())
       .then(data => {
+        console.log(data);
 
 
         data = captureLocations(data);
