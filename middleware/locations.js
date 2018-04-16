@@ -15,7 +15,8 @@ const filterOutGeometry = (data) => {
   let filtered;
   let arr = [];
   data.forEach(obj => {
-
+    console.log(obj);
+    let foo = (obj["photos"])? obj["photos"][0].photo_reference : "none"
     let item = {
       "address": obj["vicinity"],
       "id": obj["id"],
@@ -24,7 +25,7 @@ const filterOutGeometry = (data) => {
       "rating": obj["rating"],
       "types": obj["types"],
       "is_open": true,
-       "photos": obj["photos"][0].photo_reference
+       "photos": foo
 
     }
     arr.push(item);
