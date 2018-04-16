@@ -50,21 +50,23 @@ const addEmail = (req, res, next) => {
   const email = req.body.email;
   console.log(req.body , "CHECK ME HERE")
   const trackingCode = req.params.trackingCode;
+  if(email != null) {
+    db.ref('sessions/'+trackingCode+'/voting_done').once('value', snap => {
+      if(!snap.val()){
+        db.ref('sessions/' + trackingCode + "/emails").once('value', snap => {
+          const emailArr = snap.val();
+          console.log(emailArr);
+          emailArr.push(email);
+          db.ref('sessions/' + trackingCode + "/emails").set(emailArr);
 
-  db.ref('sessions/'+trackingCode+'/voting_done').once('value', snap => {
-    if(!snap.val()){
-      db.ref('sessions/' + trackingCode + "/emails").once('value', snap => {
-        const emailArr = snap.val();
-        console.log(emailArr);
-        emailArr.push(email);
-        db.ref('sessions/' + trackingCode + "/emails").set(emailArr);
-
-      });
-    }
+        });
+      }
+    });
 
 
 
-  });
+  }
+
 
 
 };
