@@ -3,7 +3,7 @@ const db = require('../database/database.js').db;
 
 
 const startsession = (req, res, next) => {
-  console.log(req.body)
+  console.log(req)
 
   let locationCoords = req.body.location;
   console.log(locationCoords);
