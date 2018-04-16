@@ -73,11 +73,11 @@ const votingDone = (req, res, next) => {
     if(!snap.val()){
       db.ref('sessions/' + sessionId + '/emails').once('value', (snap) => {
         let emailsAmt = snap.val();
-        emailsAmt = emailsAmt.length;
+        emailsAmt = emailsAmt.length + 1;
         db.ref('sessions/' + sessionId + '/guest_qty').once('value', snap => {
           let limit = snap.val();
           limit = parseInt(limit);
-          if (emailsAmt >= limit) {
+          if (emailsAmt >= limit ) {
             db.ref('sessions/' + sessionId + "/voting_done").once('value', snap => {
               db.ref('sessions/' + sessionId + "/voting_done").set(true);
               console.log('voting done');
