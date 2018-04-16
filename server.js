@@ -68,12 +68,11 @@ app.get('/api/:trackingCode/load_images', (req, res) => {
   });
 });
 
-//  End voting tracker this has to be here for some reason...
-app.use('/api/:trackingCode/', voting.votingDone);
 
 //  Add email
 app.post('/api/:trackingCode/email_add', (req, res) => {
       emails.addEmail(req, res);
+      voting.votingDone(req,res);
       res.json('email added succesfully');
 });
 
