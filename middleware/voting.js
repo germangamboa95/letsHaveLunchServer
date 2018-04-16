@@ -22,7 +22,7 @@ const getWinner = (trackingCode, callback) => {
         if(item['place_id'] === winner){
           winnerData = item;
         }
-
+  
       });
       callback(sessionId , winnerData);
 
