@@ -47,6 +47,7 @@ const loadLocations = (req, res, next) => {
   const lon = -81.427695;
   const radius = 1000;
 
+
   db.ref('sessions/' + trackingCode + '/locations').once('value', (snap) => {
 
      if (snap.val()) {
@@ -57,18 +58,25 @@ const loadLocations = (req, res, next) => {
        next();
 
     } else {
-      console.log('I do not exist');
-      fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&opennow&type=restaurant&keyword=restaurant&key=${googleKey}`)
-        .then(res => res.json())
-        .then(data => {
-          console.log(data);
+      db.ref('sessions/'+trackingCode+"locationCoords").once('value', snap => {
+        let coords = snap.val();
+        lon = coords.long;
+        lat = coords.lat;
+        console.log('I do not exist');
+        fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&opennow&type=restaurant&keyword=restaurant&key=${googleKey}`)
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
 
-          data = captureLocations(data);
-          data = filterOutGeometry(data);
-          db.ref("sessions/" + trackingCode+"/locations/").set(data);
-          res.locals.locationData = data;
-          next();
-        });
+            data = captureLocations(data);
+            data = filterOutGeometry(data);
+            db.ref("sessions/" + trackingCode+"/locations/").set(data);
+            res.locals.locationData = data;
+            next();
+          });
+
+      });
+
     }
 
   });
