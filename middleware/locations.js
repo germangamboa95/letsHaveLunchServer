@@ -23,8 +23,8 @@ const filterOutGeometry = (data) => {
       "name": obj["name"],
       "rating": obj["rating"],
       "types": obj["types"],
-      "is_open": true
-      // "photos": obj["photos"][0].photo_reference
+      "is_open": true,
+       "photos": obj["photos"][0].photo_reference
 
     }
     arr.push(item);
@@ -44,7 +44,7 @@ const loadLocations = (req, res, next) => {
 
   let trackingCode = req.params.trackingCode;
 
-  const radius = 6000;
+  const radius = 500;
 
 
   db.ref('sessions/' + trackingCode + '/locations').once('value', (snap) => {
