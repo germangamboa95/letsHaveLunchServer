@@ -45,7 +45,7 @@ const loadLocations = (req, res, next) => {
 
   let trackingCode = req.params.trackingCode;
 
-  const radius = 500;
+  const radius = 2000;
 
 
   db.ref('sessions/' + trackingCode + '/locations').once('value', (snap) => {
