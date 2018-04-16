@@ -23,8 +23,8 @@ const filterOutGeometry = (data) => {
       "name": obj["name"],
       "rating": obj["rating"],
       "types": obj["types"],
-      "is_open": true,
-      "photos": obj["photos"][0].photo_reference
+      "is_open": true
+      // "photos": obj["photos"][0].photo_reference
 
     }
     arr.push(item);
@@ -43,9 +43,8 @@ const loadLocations = (req, res, next) => {
 
 
   let trackingCode = req.params.trackingCode;
-  const lat = 28.374160;
-  const lon = -81.427695;
-  const radius = 1000;
+
+  const radius = 6000;
 
 
   db.ref('sessions/' + trackingCode + '/locations').once('value', (snap) => {
@@ -58,10 +57,11 @@ const loadLocations = (req, res, next) => {
        next();
 
     } else {
-      db.ref('sessions/'+trackingCode+"locationCoords").once('value', snap => {
+      db.ref('sessions/'+trackingCode+"/locationCoords").once('value', snap => {
         let coords = snap.val();
-        lon = coords.long;
-        lat = coords.lat;
+        console.log(coords);
+        let lon = coords.long;
+        let lat = coords.lat;
         console.log('I do not exist');
         fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&opennow&type=restaurant&keyword=restaurant&key=${googleKey}`)
           .then(res => res.json())
