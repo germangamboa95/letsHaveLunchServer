@@ -77,7 +77,7 @@ const votingDone = (req, res, next) => {
         db.ref('sessions/' + sessionId + '/guest_qty').once('value', snap => {
           let limit = snap.val();
           limit = parseInt(limit);
-          if (emailsAmt >= limit ) {
+          if (emailsAmt >= limit - 1) {
             db.ref('sessions/' + sessionId + "/voting_done").once('value', snap => {
               db.ref('sessions/' + sessionId + "/voting_done").set(true);
               console.log('voting done');
