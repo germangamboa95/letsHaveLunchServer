@@ -69,6 +69,8 @@ const addEmail = (req, res, next) => {
 
 
 
+  } else {
+    next();
   }
 
 
