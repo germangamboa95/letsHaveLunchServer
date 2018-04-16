@@ -27,7 +27,10 @@ const loadImages = (req, res, next) => {
       data.forEach(item => {
         let id = item["photos"];
         let ref = item['place_id'];
-        getPhotos(id, ref, trackingCode);
+        if(id != 'none') {
+          getPhotos(id, ref, trackingCode);
+        }
+
       });
 
       next();
