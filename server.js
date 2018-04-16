@@ -69,10 +69,11 @@ app.get('/api/:trackingCode/load_images', (req, res) => {
   });
 });
 
+app.use('/api/:trackingCode/email_add', emails.addEmail);
 
 //  Add email
 app.post('/api/:trackingCode/email_add', (req, res) => {
-      emails.addEmail(req, res);
+
       voting.votingDone(req,res);
       res.json('email added succesfully');
 });

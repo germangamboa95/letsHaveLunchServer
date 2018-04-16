@@ -74,6 +74,7 @@ const votingDone = (req, res, next) => {
       db.ref('sessions/' + sessionId + '/emails').once('value', (snap) => {
         let emailsAmt = snap.val();
         emailsAmt = emailsAmt.length;
+        console.log(snap.val());
         db.ref('sessions/' + sessionId + '/guest_qty').once('value', snap => {
           let limit = snap.val();
           limit = parseInt(limit);
@@ -83,12 +84,17 @@ const votingDone = (req, res, next) => {
               console.log('voting done');
                getWinner(sessionId, email.emailBlast);
 
+
             });
+          } else {
+
           }
         });
 
       });
-      }
+    } else {
+
+    }
     });
 
 
