@@ -88,10 +88,6 @@ const votingDone = (req, res, next) => {
         });
 
       });
-
-
-
-
       }
     });
 

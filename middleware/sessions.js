@@ -6,6 +6,7 @@ const startsession = (req, res, next) => {
   console.log('I am triggered')
 
   let locationCoords = req.body.location;
+  console.log(locationCoords);
   let email = req.body.email;
   let guests = req.body.guests;
   db.ref("sessions/").push({
