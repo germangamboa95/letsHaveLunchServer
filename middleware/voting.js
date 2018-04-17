@@ -21,6 +21,8 @@ const getWinner = (trackingCode, callback) => {
       locationArr.forEach(item => {
         if(item['place_id'] === winner){
           winnerData = item;
+          db.ref('sessions/' + sessionId + "/winner").set(winnerData);
+
         }
 
       });
@@ -82,6 +84,7 @@ const votingDone = (req, res, next) => {
             db.ref('sessions/' + sessionId + "/voting_done").once('value', snap => {
               db.ref('sessions/' + sessionId + "/voting_done").set(true);
               console.log('voting done');
+
                getWinner(sessionId, email.emailBlast);
 
 

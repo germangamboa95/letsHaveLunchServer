@@ -2,9 +2,11 @@ const db = require('../database/database.js').db;
 const nodemailer = require('nodemailer');
 
 
-const emailBlast = (trackingCode, winner) => {
+const emailBlast = (trackingCode, data) => {
   db.ref('sessions/' + trackingCode + "/emails").once('value', snap => {
     let emailArr = snap.val();
+    let params = encodeURI(data.address);
+    //let img = results.images[data.place_id];
     emailArr.forEach(email => {
       console.log(email);
       var transporter = nodemailer.createTransport({
@@ -22,10 +24,20 @@ const emailBlast = (trackingCode, winner) => {
         html:
         `
           <div style="width:360px; margin: 10px auto;">
-          <h1>Below is where we are having lunch:</h1>
-          <h2>${winner.name}</h2>
-          <p>Address: ${winner.address}</p>
-          <p>Rating: ${winner.rating}</p>
+          <div class="card medium mb-2">
+            <div class="card-image">
+              <img src="${"image goes here"}">
+              <span class="card-title">Top choice: <span id="locName">${data.name}</span></span>
+              </div>
+              <div class="card-content">
+                <p>
+                  ${data.address}
+                </p>
+                <div class="card-action">
+                  <a class="waves-effect waves-light btn right btn-large green accent-4" href="https://www.google.com/maps/search/?api=1&query=${params}&query_place_id=${data.place_id}">Go There!</a>
+                </div>
+            </div>
+          </div>
           </div>
 
 
