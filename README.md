@@ -16,7 +16,7 @@ POST  https://letshavelunchserver.herokuapp.com/api/session_start
 You will receive a response with the session key:
 
 
-
+   
 ## Loading location data
 
 GET https://letshavelunchserver.herokuapp.com/api/{session}/load_location_data
