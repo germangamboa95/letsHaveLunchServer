@@ -14,21 +14,27 @@ const filterOutGeometry = (data) => {
 
   let filtered;
   let arr = [];
-  data.forEach(obj => {
-    console.log(obj);
-    let foo = (obj["photos"])? obj["photos"][0].photo_reference : "none"
-    let item = {
-      "address": obj["vicinity"],
-      "id": obj["id"],
-      "place_id": obj["place_id"],
-      "name": obj["name"],
-      "rating": obj["rating"],
-      "types": obj["types"],
-      "is_open": true,
-       "photos": foo
+  data.forEach((obj, index)=> {
+    console.log(index);
+
+    if(index < 5){
+      let foo = (obj["photos"])? obj["photos"][0].photo_reference : "none"
+      let item = {
+        "address": obj["vicinity"],
+        "id": obj["id"],
+        "place_id": obj["place_id"],
+        "name": obj["name"],
+        "rating": obj["rating"],
+        "types": obj["types"],
+        "is_open": true,
+         "photos": foo
+
+      }
+      arr.push(item);
+
 
     }
-    arr.push(item);
+
   });
   console.log(arr);
   return arr;
