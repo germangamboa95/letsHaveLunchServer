@@ -59,7 +59,7 @@ const emailBlast = (trackingCode, data) => {
 
 
 const addEmail = (req, res, next) => {
-  const email = req.body.email;
+  let email = req.body.email;
   console.log(req.body , "CHECK ME HERE")
   const trackingCode = req.params.trackingCode;
   email = (email)? email: [];
