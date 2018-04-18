@@ -16,7 +16,7 @@ const filterOutGeometry = (data) => {
   let arr = [];
   data.forEach((obj, index)=> {
     console.log(index);
-
+    //  This limits the total locations to no more than 5.
     if(index < 5){
       let foo = (obj["photos"])? obj["photos"][0].photo_reference : "none"
       let item = {

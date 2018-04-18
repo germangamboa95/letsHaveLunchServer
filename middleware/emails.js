@@ -62,7 +62,7 @@ const addEmail = (req, res, next) => {
   const email = req.body.email;
   console.log(req.body , "CHECK ME HERE")
   const trackingCode = req.params.trackingCode;
-
+  email = (email)? email: [];
   if(email != null) {
     db.ref('sessions/'+trackingCode+'/voting_done').once('value', snap => {
       if(!snap.val()){
